@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog class = "dialogClass" :visible.sync="chooseSizeDialog" width="30%" append-to-body>
+    <el-dialog class="dialogClass" :visible.sync="chooseSizeDialog" width="30%" append-to-body>
       <header style="padding-bottom: 20px">
         <div>
           <img src="../../assets/img/sneaker.jpeg" width="60">
@@ -10,58 +10,49 @@
         </div>
       </header>
       <el-row>
-        <el-col :span="6" v-for="i in 13" :key="i" style="margin-top: 10px">
-          <el-button class="sizeButton">{{34+i}}</el-button>
+        <el-col :span="6" v-for="i in size" :key="i" style="margin-top: 10px">
+          <el-button class="sizeButton" @click="confirmSize(i)">{{ i }}</el-button>
         </el-col>
-<!--        <el-button class="sizeButton">35</el-button>-->
-<!--        <el-button class="sizeButton">36</el-button>-->
-<!--        <el-button class="sizeButton">37</el-button>-->
-<!--        <el-button class="sizeButton">38</el-button>-->
-<!--        <el-button class="sizeButton">39</el-button>-->
       </el-row>
-<!--      <el-row style="margin-top: 10px">-->
-<!--        <el-button class="sizeButton">40</el-button>-->
-<!--        <el-button class="sizeButton">41</el-button>-->
-<!--        <el-button class="sizeButton">42</el-button>-->
-<!--        <el-button class="sizeButton">43</el-button>-->
-<!--        <el-button class="sizeButton">44</el-button>-->
-<!--      </el-row>-->
-<!--      <el-row style="margin-top: 10px">-->
-<!--        <el-button class="sizeButton">45</el-button>-->
-<!--        <el-button class="sizeButton">46</el-button>-->
-<!--        <el-button class="sizeButton">47</el-button>-->
-<!--      </el-row>-->
       <div>
-        <el-button type="primary" @click="chooseSizeDialog = false" style="width: 100%;background-color: black;border-color: black;margin-top: 15px">提 交 订 单</el-button>
+        <el-button type="primary" @click="deliverOrder"
+                   style="width: 100%;background-color: black;border-color: black;margin-top: 15px">提 交 订 单
+        </el-button>
       </div>
-<!--      <div style="padding-top: 10px;font-size: 8px;font-weight: 300;color: gray">-->
-<!--        还不是会员？-->
-<!--        <el-button @click="loginDialog = false;registerDialog = true" type="text" style="font-size: 8px;font-weight: 400;color: black">加入我们</el-button>-->
-<!--      </div>-->
     </el-dialog>
-      <el-carousel :interval="4000" type="card" height="300px">
-        <el-carousel-item>
-          <img src="../../assets/img/AJ1VoltGold.jpeg" width="50%">
-          <img src="../../assets/img/AJ1NotForResale.jpeg" width="50%">
-        </el-carousel-item>
-        <el-carousel-item>
-          <img src="../../assets/img/AJ1UniversityBlue.jpeg" width="50%">
-          <img src="../../assets/img/AJ1MetallicSilver.jpeg" width="50%">
-        </el-carousel-item>
-        <el-carousel-item>
-          <img src="../../assets/img/AJ4UniversityBlue.jpeg" width="50%">
-          <img src="../../assets/img/AJ5White.jpeg" width="50%">
-        </el-carousel-item>
-      </el-carousel>
+    <!-- 滑动显示面板 -->
+    <el-carousel :interval="4000" type="card" height="300px">
+      <el-carousel-item>
+        <img src="../../assets/img/AJ1VoltGold.jpeg" width="50%">
+        <img src="../../assets/img/AJ1NotForResale.jpeg" width="50%">
+      </el-carousel-item>
+      <el-carousel-item>
+        <img src="../../assets/img/AJ1UniversityBlue.jpeg" width="50%">
+        <img src="../../assets/img/AJ1MetallicSilver.jpeg" width="50%">
+      </el-carousel-item>
+      <el-carousel-item>
+        <img src="../../assets/img/AJ4UniversityBlue.jpeg" width="50%">
+        <img src="../../assets/img/AJ5StealthWB.jpeg" width="50%">
+      </el-carousel-item>
+    </el-carousel>
+
     <el-row :gutter="15">
       <el-col :span="8" v-for="(item,i) in shoes" :key="i">
         <el-card :body-style="{ padding: '10px' }">
-          <img :src="require('../../assets/img/'+item.picture)" class="image">
+          <img :src="require('../../assets/img/'+item.sneakerItem.image)" class="image">
           <div style="padding: 14px;">
-            <span>{{item.name}}</span>
+            <span>{{ item.sneakerItem.name }}</span>
             <div class="bottom clearfix">
-              <time class="time">{{ currentDate }}</time>
-              <el-button @click="chooseSizeDialog = true" type="text" class="button">立刻抢购</el-button>
+              <div>
+                <label style="font-size: 10px;font-weight: 400;color: gray">开始时间 </label>
+                <time class="time">{{ item.startTime }}</time>
+              </div>
+              <div>
+                <label style="font-size: 10px;font-weight: 400;color: gray">结束时间 </label>
+                <time class="time">{{ item.endTime }}</time>
+              </div>
+              <el-button v-if="new Date(item.startTime) <= currentDate && new Date(item.endTime) >= currentDate" @click="chooseSize(item)" type="text" class="button">立刻抢购</el-button>
+              <el-button v-else type="text" class="button" disabled>暂未开始</el-button>
             </div>
           </div>
         </el-card>
@@ -76,32 +67,54 @@ export default {
   data() {
     return {
       currentDate: new Date(),
-      shoes: [
-        {
-          name: "Air Jordan 1 High OG 'Volt Gold'",
-          picture: "AJ1VoltGold.jpeg"
-        },
-        {
-          name: "Air Jordan 1 High OG 'University Blue'",
-          picture: "AJ1UniversityBlue.jpeg"
-        },
-        {
-          name: "Air Jordan 1 High OG 'Metallic Silver'",
-          picture: "AJ1MetallicSilver.jpeg"
-        },
-        {
-          name: "Air Jordan 4 'University Blue'",
-          picture: "AJ4UniversityBlue.jpeg"
-        },
-        {
-          name: "Air Jordan 1 High OG 'NOT FOR RESALE'",
-          picture: "AJ1NotForResale.jpeg"
-        },
-      ],
-      chooseSizeDialog: false
+      shoes: [],
+      chooseSizeDialog: false,
+      size: [],
+      dto: {
+        itemId: '',
+        shoeSize: '',
+        userId: '2' // TODO 这里先写死，有token以后不需要传用户id
+      }
     };
   },
+  mounted() {
+    this.loadItems()
+  },
   methods: {
+    loadItems() {
+      this.$axios.get('/item/all').then(resp => {
+        if (resp && resp.data.code === 200) {
+          this.shoes = resp.data.result
+        }
+      })
+    },
+    chooseSize(item) {
+      this.dto.itemId = item.itemId
+      // size形式如 35,36,37,38,39
+      this.size = item.sneakerItem.size.split(",")
+      this.chooseSizeDialog = true
+    },
+    deliverOrder() {
+      this.chooseSizeDialog = false
+      // TODO 携带token提交订单
+      this.$axios.post('/item/order', {
+        itemId: this.dto.itemId,
+        size: this.dto.shoeSize,
+        userId: this.dto.userId
+      }).then(resp => {
+        if (resp && resp.data.code === 200) {
+          this.$message({
+            message: '订单提交成功,我们将尽快处理您的订单',
+            type: 'success'
+          })
+        } else {
+          this.$message.error(resp.data.message)
+        }
+      })
+    },
+    confirmSize(size) {
+      this.dto.shoeSize = size;
+    }
   }
 }
 </script>
@@ -152,16 +165,19 @@ export default {
 .clearfix:after {
   clear: both
 }
+
 .sizeButton:hover {
   background: black;
   color: white;
   border-color: black;
 }
+
 .sizeButton:active {
   background: black;
   color: white;
   border-color: black;
 }
+
 .sizeButton:focus {
   background: black;
   color: white;

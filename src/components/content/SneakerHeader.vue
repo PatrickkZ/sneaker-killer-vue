@@ -9,19 +9,22 @@
           <label>登录SNEAKER KILLER账号</label>
         </div>
       </header>
-      <el-form :model="form">
+      <el-form :model="loginDto">
         <el-form-item>
-          <el-input v-model="form.name" placeholder="电子邮箱" autocomplete="off"></el-input>
+          <el-input v-model="loginDto.username" placeholder="用户名" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="form.name" placeholder="密码" autocomplete="off"></el-input>
+          <el-input v-model="loginDto.password" placeholder="密码" autocomplete="off" type="password"></el-input>
         </el-form-item>
       </el-form>
+      <div>
+        <label style="float: right;padding-top: 0;color: red;font-weight: 400;font-size: 10px">{{loginHint}}</label>
+      </div>
         <div>
           <el-button type="text" style="float: left;padding-top: 0;color: grey;font-weight: 400">忘记密码？</el-button>
         </div>
         <div>
-          <el-button type="primary" @click="loginDialog = false" style="width: 100%;background-color: black;margin-top: 15px">登 录</el-button>
+          <el-button type="primary" @click="login" style="width: 100%;background-color: black;margin-top: 15px">登 录</el-button>
         </div>
       <div style="padding-top: 10px;font-size: 8px;font-weight: 300;color: gray">
         还不是会员？
@@ -38,19 +41,25 @@
           <label>注册成为SNEAKER会员</label>
         </div>
       </header>
-      <el-form :model="form">
+      <el-form :model="registerDto">
         <el-form-item>
-          <el-input v-model="form.name" placeholder="电子邮箱" autocomplete="off"></el-input>
+          <el-input v-model="registerDto.username" placeholder="用户名 (字母、数字、下划线)" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="form.name" placeholder="密码" autocomplete="off"></el-input>
+          <el-input v-model="registerDto.email" placeholder="电子邮箱" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="form.name" placeholder="确认密码" autocomplete="off"></el-input>
+          <el-input v-model="registerDto.password" placeholder="密码 (字母、数字)" autocomplete="off" type="password"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="registerDto.confirmPass" placeholder="确认密码" autocomplete="off" type="password"></el-input>
         </el-form-item>
       </el-form>
       <div>
-        <el-button type="primary" @click="registerDialog = false" style="width: 100%;background-color: black;margin-top: 15px">注 册</el-button>
+        <label style="float: left;padding-top: 0;color: red;font-weight: 400;font-size: 10px">{{hint}}</label>
+      </div>
+      <div>
+        <el-button type="primary" @click="register" style="width: 100%;background-color: black;margin-top: 15px">注 册</el-button>
       </div>
       <div style="padding-top: 10px;font-size: 8px;font-weight: 300;color: gray">
         已经是会员？
@@ -64,7 +73,8 @@
           <label>SNEAKER KILLER</label>
         </div>
         <el-button type="text" style="color: black;width: 50px;float: right;font-weight: 400">帮助</el-button>
-        <el-button @click="loginDialog = true" type="text" style="color: black;width: 50px;float: right;font-weight: 400">登陆</el-button>
+        <el-button v-if="userLogin === false" @click="loginDialog = true"  type="text" style="color: black;width: 50px;float: right;font-weight: 400">登陆</el-button>
+        <el-button v-if="userLogin === true" type="text" style="color: black;width: 70px;float: right;font-weight: 500">个人中心</el-button>
       </div>
     </div>
     <div class="header2">
@@ -90,18 +100,118 @@ export default {
     return {
       loginDialog: false,
       registerDialog: false,
-      form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+      formLabelWidth: '120px',
+      hint: '',
+      loginHint: '',
+      registerDto: {
+        username: '',
+        email: '',
+        password: '',
+        confirmPass: ''
       },
-      formLabelWidth: '120px'
+      loginDto: {
+        username: '',
+        password: ''
+      },
+      userLogin: false
     };
+  },
+  methods: {
+    register() {
+      // 非空校验
+      if(this.registerDto.username === ''){
+        this.hint = '请输入用户名'
+        return
+      }
+      if(this.registerDto.email === ''){
+        this.hint = '请输入邮箱'
+        return
+      }
+      if(this.registerDto.password === ''){
+        this.hint = '请输入密码'
+        return
+      }
+      if(this.registerDto.confirmPass === ''){
+        this.hint = '请输入确认密码'
+        return
+      }
+      // 合法性校验
+      let usernameReg = /^[a-zA-Z0-9]\w{5,17}$/
+      if(!usernameReg.test(this.registerDto.username)){
+        this.hint = '用户名不合法'
+        return
+      }
+      let emailReg = /^[0-9a-zA-Z]+\w*@([0-9a-z]+\.)+[0-9a-z]+$/
+      if(!emailReg.test(this.registerDto.email)){
+        this.hint = '邮箱格式不合法'
+        return
+      }
+      let passReg = /^[a-zA-Z0-9]{6,16}$/
+      if(!passReg.test(this.registerDto.password)){
+        this.hint = '密码格式不合法'
+        return
+      }
+      if(this.registerDto.password !== this.registerDto.confirmPass){
+        this.hint = '两次输入的密码不一致'
+        return
+      }
+      this.hint = ''
+      this.$axios.post('/sk/register', {
+        username: this.registerDto.username,
+        email: this.registerDto.email,
+        password: this.registerDto.password
+      }).then(resp => {
+        if (resp && resp.data.code === 200) {
+          this.$message({
+            message: '注册成功',
+            type: 'success'
+          })
+        } else {
+          this.$message.error(resp.data.message)
+        }
+      })
+    },
+    login() {
+      // 非空校验
+      if(this.loginDto.username === ''){
+        this.loginHint = '请输入用户名'
+        return
+      }
+      if(this.loginDto.password === ''){
+        this.loginHint = '请输入密码'
+        return
+      }
+
+      let usernameReg = /^[a-zA-Z0-9]\w{5,17}$/
+      if(!usernameReg.test(this.loginDto.username)){
+        this.loginHint = '用户名不存在'
+        return
+      }
+      let passReg = /^[a-zA-Z0-9]{6,16}$/
+      if(!passReg.test(this.loginDto.password)){
+        this.loginHint = '密码错误'
+        return
+      }
+
+      this.loginHint = ''
+      this.$axios.post('/sk/login', {
+        username: this.loginDto.username,
+        password: this.loginDto.password
+      }).then(resp => {
+        if (resp && resp.data.code === 200) {
+          this.$message({
+            message: '登录成功',
+            type: 'success'
+          })
+          this.userLogin = true;
+          this.loginDialog = false;
+          const token = resp.data.result;
+          localStorage.setItem("SKtoken", token)
+        } else {
+          this.$message.error(resp.data.message)
+        }
+      })
+    }
   }
 }
 </script>
