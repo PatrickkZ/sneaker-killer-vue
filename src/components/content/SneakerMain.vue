@@ -52,7 +52,7 @@
                 <time class="time">{{ item.endTime }}</time>
               </div>
               <el-button v-if="new Date(item.startTime) <= currentDate && new Date(item.endTime) >= currentDate" @click="chooseSize(item)" type="text" class="button">立刻抢购</el-button>
-              <el-button v-else type="text" class="button" disabled>暂未开始</el-button>
+              <el-button v-else type="text" class="button" disabled>活动未开放</el-button>
             </div>
           </div>
         </el-card>

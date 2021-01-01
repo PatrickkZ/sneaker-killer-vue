@@ -72,9 +72,11 @@
         <div style="padding-top: 4px;float: left;font-size: 25px;font-family:'American Typewriter';font-style: italic">
           <label>SNEAKER KILLER</label>
         </div>
-        <el-button type="text" style="color: black;width: 50px;float: right;font-weight: 400">帮助</el-button>
-        <el-button v-if="userLogin === false" @click="loginDialog = true"  type="text" style="color: black;width: 50px;float: right;font-weight: 400">登陆</el-button>
-        <el-button v-if="userLogin === true" type="text" style="color: black;width: 70px;float: right;font-weight: 500">个人中心</el-button>
+        <el-button @click="toHome" type="text" style="color: black;width: 50px;float: right;font-weight: 400">主页</el-button>
+        <el-button v-if="userLogin === false" @click="loginDialog = true" type="text"
+                   style="color: black;width: 50px;float: right;font-weight: 400">登陆
+        </el-button>
+        <el-button v-if="userLogin === true" @click="myOrder" type="text" style="color: black;width: 70px;float: right;font-weight: 500">我的订单</el-button>
       </div>
     </div>
     <div class="header2">
@@ -211,6 +213,15 @@ export default {
           this.$message.error(resp.data.message)
         }
       })
+    },
+    handleCommand(){
+
+    },
+    myOrder(){
+      this.$router.replace('/sneaker-killer/center')
+    },
+    toHome(){
+      this.$router.replace('/sneaker-killer/home')
     }
   }
 }
