@@ -76,7 +76,9 @@
         <el-button v-if="userLogin === false" @click="loginDialog = true" type="text"
                    style="color: black;width: 50px;float: right;font-weight: 400">登陆
         </el-button>
+        <el-button v-if="userLogin === true" @click="logout" type="text" style="color: gray;width: 70px;float: right;font-weight: 400">退出登录</el-button>
         <el-button v-if="userLogin === true" @click="myOrder" type="text" style="color: black;width: 70px;float: right;font-weight: 500">我的订单</el-button>
+
       </div>
     </div>
     <div class="header2">
@@ -114,9 +116,13 @@ export default {
       loginDto: {
         username: '',
         password: ''
-      },
-      userLogin: false
+      }
     };
+  },
+  computed: {
+    userLogin() {
+      return this.$store.state.token !== ''
+    }
   },
   methods: {
     register() {
@@ -208,19 +214,20 @@ export default {
           this.userLogin = true;
           this.loginDialog = false;
           const token = resp.data.result;
-          localStorage.setItem("SKtoken", token)
+          this.$store.commit('login', token)
         } else {
           this.$message.error(resp.data.message)
         }
       })
     },
-    handleCommand(){
-
-    },
     myOrder(){
       this.$router.replace('/sneaker-killer/center')
     },
     toHome(){
+      this.$router.replace('/sneaker-killer/home')
+    },
+    logout(){
+      this.$store.commit('logout')
       this.$router.replace('/sneaker-killer/home')
     }
   }

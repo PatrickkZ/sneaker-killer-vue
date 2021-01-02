@@ -101,6 +101,10 @@ export default {
         itemId: this.dto.itemId,
         size: this.dto.shoeSize,
         userId: this.dto.userId
+      },{
+        headers: {
+          "Authorization": localStorage.getItem("SKtoken")
+        }
       }).then(resp => {
         if (resp && resp.data.code === 200) {
           this.$message({
@@ -108,6 +112,7 @@ export default {
             type: 'success'
           })
         } else {
+          this.$store.commit('logout')
           this.$message.error(resp.data.message)
         }
       })

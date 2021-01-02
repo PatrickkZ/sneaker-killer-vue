@@ -65,9 +65,16 @@ export default {
   },
   methods: {
     loadOrder(){
-      this.$axios.get('/user/order').then(resp => {
+      this.$axios.get('/user/order',{
+        headers: {
+          "Authorization": localStorage.getItem("SKtoken")
+        }
+      }).then(resp => {
         if (resp && resp.data.code === 200) {
           this.orders = resp.data.result
+        } else {
+          this.$store.commit('logout')
+          this.$message.error(resp.data.message)
         }
       })
     },
