@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        token: window.localStorage.getItem('SKtoken') == null ? '' : window.localStorage.getItem('SKtoken')
+        token: window.localStorage.getItem('SKtoken')
     },
     mutations: {
         login (state, data) {
@@ -13,7 +13,7 @@ export default new Vuex.Store({
             window.localStorage.setItem('SKtoken', data)
         },
         logout (state) {
-            state.token = ''
+            state.token = null
             window.localStorage.removeItem('SKtoken')
         }
     }

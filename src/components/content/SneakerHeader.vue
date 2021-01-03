@@ -121,7 +121,7 @@ export default {
   },
   computed: {
     userLogin() {
-      return this.$store.state.token !== ''
+      return this.$store.state.token !== null
     }
   },
   methods: {

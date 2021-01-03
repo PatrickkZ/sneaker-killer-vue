@@ -54,6 +54,7 @@
 
 <script>
 export default {
+  inject: ['reload'],
   name: "PersonalCenter",
   data() {
     return {
@@ -72,6 +73,7 @@ export default {
       }).then(resp => {
         if (resp && resp.data.code === 200) {
           this.orders = resp.data.result
+          console.log(resp.data.result)
         } else {
           this.$store.commit('logout')
           this.$message.error(resp.data.message)
@@ -87,8 +89,24 @@ export default {
         return '超时未支付'
       }
     },
-    payBill(){
-
+    payBill(row){
+      this.$axios.post('/user/pay', {
+        id: row.id
+      }, {
+        headers: {
+          "Authorization": localStorage.getItem("SKtoken")
+        }
+      }).then(resp => {
+        if (resp && resp.data.code === 200) {
+          this.$message({
+            message: '支付成功',
+            type: 'success'
+          })
+          this.reload()
+        } else {
+          this.$message.error(resp.data.message)
+        }
+      })
     }
   }
 }

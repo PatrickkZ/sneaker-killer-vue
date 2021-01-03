@@ -72,8 +72,7 @@ export default {
       size: [],
       dto: {
         itemId: '',
-        shoeSize: '',
-        userId: '2' // TODO 这里先写死，有token以后不需要传用户id
+        shoeSize: ''
       }
     };
   },
@@ -96,11 +95,9 @@ export default {
     },
     deliverOrder() {
       this.chooseSizeDialog = false
-      // TODO 携带token提交订单
       this.$axios.post('/item/order', {
         itemId: this.dto.itemId,
-        size: this.dto.shoeSize,
-        userId: this.dto.userId
+        size: this.dto.shoeSize
       },{
         headers: {
           "Authorization": localStorage.getItem("SKtoken")
